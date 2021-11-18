@@ -1,0 +1,35 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: wagi
+spec:
+  running: true
+  template:
+    metadata:
+      annotations:
+        hooks.kubevirt.io/hookSidecars: '[{"args": ["--version", "v1alpha2"], "image": "docker.io/nirmoy/kubevirt-serial"}]'
+        serial.vm.kubevirt.io/serialConsoleFile: /var/run/serial0
+      labels:
+        special: wagi
+        kubevirt.io/domain: wagi
+    spec:
+      nodeSelector: 
+        vms: "true"
+      domain:
+        cpu:
+          cores: 1
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: disk0
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 192M
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: disk0
+        containerDisk:
+          image: cnabquickstarts.azurecr.io/wagi:0.4.0
